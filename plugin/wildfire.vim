@@ -31,15 +31,22 @@ let g:wildfire_water_map =
 " Commands and Mappings
 " =============================================================================
 
-nnoremap <silent> <Plug>(wildfire-fuel) :<C-U>call wildfire#start(v:count1)<CR>
-vnoremap <silent> <Plug>(wildfire-fuel) :<C-U>call wildfire#fuel(v:count1)<CR>
-vnoremap <silent> <Plug>(wildfire-water) :<C-U>call wildfire#water()<CR>
+function! s:SetCommands()
+    if !empty(&bt)
+        return
+    endif
 
-if !hasmapto('<Plug>(wildfire-fuel)') && !hasmapto('<Plug>(wildfire-water)')
-  exe "nnoremap " . g:wildfire_fuel_map . " <Plug>(wildfire-fuel)"
-  exe "map" g:wildfire_fuel_map "<Plug>(wildfire-fuel)"
-  exe "map" g:wildfire_water_map "<Plug>(wildfire-water)"
-endif
+    nnoremap <silent> <Plug>(wildfire-fuel) :<C-U>call wildfire#start(v:count1)<CR>
+    vnoremap <silent> <Plug>(wildfire-fuel) :<C-U>call wildfire#fuel(v:count1)<CR>
+    vnoremap <silent> <Plug>(wildfire-water) :<C-U>call wildfire#water()<CR>
+
+    if !hasmapto('<Plug>(wildfire-fuel)') && !hasmapto('<Plug>(wildfire-water)')
+        exe "nnoremap " . g:wildfire_fuel_map . " <Plug>(wildfire-fuel)"
+        exe "map" g:wildfire_fuel_map "<Plug>(wildfire-fuel)"
+        exe "map" g:wildfire_water_map "<Plug>(wildfire-water)"
+    endif
+endfunction
+
 
 " Autocommands
 " =============================================================================
@@ -47,10 +54,8 @@ endif
 augroup wildfire
     au!
 
-    " Disable Wildfire inside help or quickfix buffers
-    au BufReadPost,CmdWinEnter * if !empty(&bt) |
-        \ sil! exec "nnoremap <buffer> " . g:wildfire_fuel_map . " " . g:wildfire_fuel_map |
-        \ endif
+    " Enable Wildfire outside of help or quickfix buffers
+    au BufReadPost,CmdWinEnter * call s:SetCommands()
 
 augroup END
 
